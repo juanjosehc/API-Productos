@@ -8,7 +8,8 @@ app = Flask(__name__)
 # --- CONFIGURACIÓN DE LA BASE DE DATOS ---
 
 # Obtener la URL de la base de datos de las variables de entorno (Render provee 'DATABASE_URL')
-database_url = os.environ.get('DATABASE_URL', 'sqlite:///local_productos.db') # Fallback a SQLite local si no hay Postgres
+# Fallback a SQLite local si no hay Postgres
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///local_productos.db') 
 
 # Corrección para SQLAlchemy 1.4+ y Render (Render usa postgres://, SQLAlchemy necesita postgresql://)
 if database_url and database_url.startswith("postgres://"):
@@ -127,5 +128,7 @@ with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
-    # En desarrollo local corre en debug, en prod Render maneja el puerto
-    app.run(debug=True)
+    # Obtiene el puerto asignado por Render (o usa 5000 por defecto para desarrollo local)
+    port = int(os.environ.get('PORT', 5000)) 
+    # Asegura que la aplicación escuche en todas las interfaces ('0.0.0.0')
+    app.run(host='0.0.0.0', port=port)
