@@ -95,7 +95,8 @@ def create_crud_routes(app, model, endpoint, required_fields):
     """
     
     # RUTA BASE: LISTAR y CREAR
-    @app.route(f'/{endpoint}', methods=['GET', 'POST'])
+    # FIX: Se añade el argumento 'endpoint' con un nombre único para evitar la sobrescritura.
+    @app.route(f'/{endpoint}', methods=['GET', 'POST'], endpoint=f'list_{endpoint}') 
     def handle_items():
         if request.method == 'GET':
             items = model.query.all()
@@ -123,7 +124,8 @@ def create_crud_routes(app, model, endpoint, required_fields):
                 return jsonify({'error': f'Error interno al guardar: {str(e)}'}), 500
 
     # RUTAS ID: OBTENER, ACTUALIZAR y ELIMINAR
-    @app.route(f'/{endpoint}/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+    # FIX: Se añade el argumento 'endpoint' con un nombre único para evitar la sobrescritura.
+    @app.route(f'/{endpoint}/<int:id>', methods=['GET', 'PUT', 'DELETE'], endpoint=f'detail_{endpoint}')
     def handle_item_by_id(id):
         item = model.query.get_or_404(id)
 
