@@ -11,9 +11,16 @@ app = Flask(__name__)
 # Fallback a SQLite local si no hay Postgres
 database_url = os.environ.get('DATABASE_URL', 'sqlite:///local_productos.db') 
 
-# Corrección para SQLAlchemy 1.4+ y Render (Render usa postgres://, SQLAlchemy necesita postgresql://)
+# === CORRECCIÓN CLAVE PARA USAR PSYCOPG 3 ===
+# Cambiamos 'postgres://' o 'postgresql://' a 'postgresql+psycopg://' 
+# Esto le dice a SQLAlchemy que use el driver Psycopg 3.
 if database_url and database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
+    # Render usa 'postgres://', lo cambiamos al dialecto Psycopg 3
+    database_url = database_url.replace("postgres://", "postgresql+psycopg://", 1)
+elif database_url and database_url.startswith("postgresql://"):
+    # Si la URL ya estaba en formato 'postgresql://', le agregamos el driver
+    database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+# ============================================
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
